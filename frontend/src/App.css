@@ -1,0 +1,120 @@
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background-color: #f1f4f8;
+}
+
+.container {
+  width: 95%;
+  max-width: 1000px;
+  margin: 30px auto;
+  padding: 25px;
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+}
+
+h1 {
+  text-align: center;
+  color: #1769aa;
+}
+
+h2 {
+  text-align: center;
+  color: #555;
+  margin-top: 25px;
+}
+
+label {
+  display: block;
+  margin-top: 15px;
+  font-weight: bold;
+}
+
+input, select, textarea {
+  width: 100%;
+  padding: 12px;
+  margin-top: 7px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 15px;
+}
+
+textarea {
+  min-height: 80px;
+  resize: vertical;
+}
+
+button {
+  padding: 12px;
+  margin-top: 20px;
+  width: 100%;
+  background-color: #1769aa;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #0d4c80;
+}
+
+.result {
+  margin-top: 25px;
+  padding: 20px;
+  background-color: #e6f5e9;
+  border-radius: 8px;
+}
+
+.result h2 {
+  color: #176b36;
+}
+
+.error {
+  margin-top: 15px;
+  padding: 12px;
+  background-color: #ffe3e3;
+  color: #b00020;
+  border-radius: 5px;
+}
+
+.table-container {
+  width: 100%;
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  margin-top: 20px;
+  border-collapse: collapse;
+  min-width: 700px;
+}
+
+th, td {
+  padding: 12px;
+  border: 1px solid #ddd;
+  text-align: center;
+}
+
+th {
+  background-color: #1769aa;
+  color: white;
+}
+
+.cancel {
+  width: auto;
+  margin: 0;
+  padding: 8px 12px;
+  background-color: #d93025;
+}
+
+.cancel:hover {
+  background-color: #a51d16;
+}
