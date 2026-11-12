@@ -1,7 +1,28 @@
 
 import { useEffect, useState } from "react";
 import "./App.css";
-
+const doctors = [
+  {
+    id: 1,
+    name: "Dr. Ravi Kumar",
+    specialization: "Cardiologist"
+  },
+  {
+    id: 2,
+    name: "Dr. Priya",
+    specialization: "Dermatologist"
+  },
+  {
+    id: 3,
+    name: "Dr. Suresh",
+    specialization: "Neurologist"
+  },
+  {
+    id: 4,
+    name: "Dr. Lakshmi",
+    specialization: "General Physician"
+  }
+];
 function App() {
 
   const [doctors, setDoctors] = useState([]);
@@ -147,7 +168,14 @@ function App() {
       <h1>Online Doctor Appointment Management System</h1>
 
       <h2>Book Your Appointment</h2>
+<h2>Available Doctors</h2>
 
+{doctors.map((doctor) => (
+  <div key={doctor.id}>
+    <h3>{doctor.name}</h3>
+    <p>{doctor.specialization}</p>
+  </div>
+))}
       <form onSubmit={handleSubmit}>
 
         <label>Patient Name</label>
