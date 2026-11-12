@@ -1,6 +1,8 @@
 
 import { useEffect, useState } from "react";
 import "./App.css";
+
+// Static doctor list
 const doctors = [
   {
     id: 1,
@@ -23,8 +25,11 @@ const doctors = [
     specialization: "General Physician"
   }
 ];
-function App() {
 
+// Backend URL
+const API_URL = "http://localhost:5000";
+
+function App() {
   const [appointments, setAppointments] = useState([]);
 
   const [form, setForm] = useState({
@@ -40,33 +45,17 @@ function App() {
 
   const [result, setResult] = useState(null);
   const [error, setError] = useState("");
-  
+
+  // Load appointments when the page opens
   useEffect(() => {
-  loadAppointments();
-}, []);
+    loadAppointments();
+  }, []);
 
- const loadDoctors = async () => {
-  try {
-    const response = await fetch(
-      "http://localhost:5000/doctors"
-    );
-
-    if (!response.ok) {
-      throw new Error("Unable to load doctors");
-    }
-
-    const data = await response.json();
-    setDoctors(data);
-
-  } catch (err) {
-    setError(err.message);
-  }
-};
-
+  // Get appointments from backend
   const loadAppointments = async () => {
     try {
       const response = await fetch(
-        "http://localhost:5000/appointments"
+        `${API_URL}/appointments`
       );
 
       if (!response.ok) {
@@ -98,7 +87,7 @@ function App() {
 
     try {
       const response = await fetch(
-        "http://localhost:5000/appointments",
+        `${API_URL}/appointments`,
         {
           method: "POST",
           headers: {
@@ -111,7 +100,9 @@ function App() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message);
+        throw new Error(
+          data.message || "Unable to book appointment"
+        );
       }
 
       setResult(data);
@@ -127,7 +118,7 @@ function App() {
         symptoms: ""
       });
 
-      loadAppointments();
+      await loadAppointments();
 
     } catch (err) {
       setError(err.message);
@@ -136,10 +127,9 @@ function App() {
 
   // Cancel appointment
   const cancelAppointment = async (id) => {
-
     try {
       const response = await fetch(
-        `http://localhost:5000/appointments/${id}/cancel`,
+        `${API_URL}/appointments/${id}/cancel`,
         {
           method: "PATCH"
         }
@@ -148,11 +138,13 @@ function App() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message);
+        throw new Error(
+          data.message || "Unable to cancel appointment"
+        );
       }
 
       setError("");
-      loadAppointments();
+      await loadAppointments();
 
     } catch (err) {
       setError(err.message);
@@ -165,14 +157,20 @@ function App() {
       <h1>Online Doctor Appointment Management System</h1>
 
       <h2>Book Your Appointment</h2>
-<h2>Available Doctors</h2>
 
-{doctors.map((doctor) => (
-  <div key={doctor.id}>
-    <h3>{doctor.name}</h3>
-    <p>{doctor.specialization}</p>
-  </div>
-))}
+      {/* Available Doctors */}
+      <h2>Available Doctors</h2>
+
+      <div className="doctor-list">
+        {doctors.map((doctor) => (
+          <div key={doctor.id} className="doctor-card">
+            <h3>{doctor.name}</h3>
+            <p>{doctor.specialization}</p>
+          </div>
+        ))}
+      </div>
+
+      {/* Appointment Form */}
       <form onSubmit={handleSubmit}>
 
         <label>Patient Name</label>
@@ -221,25 +219,27 @@ function App() {
           maxLength="10"
           required
         />
-<label>Select Doctor</label>
 
-<select
-  name="doctor_id"
-  value={form.doctor_id}
-  onChange={handleChange}
-  required
->
-  <option value="">Select Doctor</option>
+        {/* Doctor Dropdown */}
+        <label>Select Doctor</label>
 
-  {doctors.map((doctor) => (
-    <option
-      key={doctor.id}
-      value={doctor.id}
-    >
-      {doctor.name} - {doctor.specialization}
-    </option>
-  ))}
-</select>
+        <select
+          name="doctor_id"
+          value={form.doctor_id}
+          onChange={handleChange}
+          required
+        >
+          <option value="">Select Doctor</option>
+
+          {doctors.map((doctor) => (
+            <option
+              key={doctor.id}
+              value={doctor.id}
+            >
+              {doctor.name} - {doctor.specialization}
+            </option>
+          ))}
+        </select>
 
         <label>Appointment Date</label>
         <input
@@ -283,12 +283,14 @@ function App() {
 
       </form>
 
+      {/* Error Message */}
       {error && (
         <div className="error">
           {error}
         </div>
       )}
 
+      {/* Appointment Confirmation */}
       {result && (
         <div className="result">
           <h2>Appointment Confirmation</h2>
@@ -315,6 +317,7 @@ function App() {
         </div>
       )}
 
+      {/* All Appointments */}
       <h2>All Appointments</h2>
 
       <div className="table-container">
@@ -337,17 +340,24 @@ function App() {
                 <td>{appointment.appointment_id}</td>
                 <td>{appointment.patient_name}</td>
                 <td>{appointment.doctor_name}</td>
+
                 <td>
-                  {String(appointment.appointment_date).slice(0, 10)}
+                  {String(
+                    appointment.appointment_date
+                  ).slice(0, 10)}
                 </td>
+
                 <td>{appointment.appointment_time}</td>
                 <td>{appointment.status}</td>
+
                 <td>
                   {appointment.status === "Booked" && (
                     <button
                       className="cancel"
                       onClick={() =>
-                        cancelAppointment(appointment.appointment_id)
+                        cancelAppointment(
+                          appointment.appointment_id
+                        )
                       }
                     >
                       Cancel
@@ -359,7 +369,9 @@ function App() {
 
             {appointments.length === 0 && (
               <tr>
-                <td colSpan="7">No appointments available</td>
+                <td colSpan="7">
+                  No appointments available
+                </td>
               </tr>
             )}
           </tbody>
