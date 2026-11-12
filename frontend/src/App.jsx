@@ -1,29 +1,10 @@
+
 import { useEffect, useState } from "react";
 import "./App.css";
-const doctors = [
-  {
-    id: 1,
-    name: "Dr. Ravi Kumar",
-    specialization: "Cardiologist"
-  },
-  {
-    id: 2,
-    name: "Dr. Priya",
-    specialization: "Dermatologist"
-  },
-  {
-    id: 3,
-    name: "Dr. Suresh",
-    specialization: "Neurologist"
-  },
-  {
-    id: 4,
-    name: "Dr. Lakshmi",
-    specialization: "General Physician"
-  }
-];
+
 function App() {
 
+  const [doctors, setDoctors] = useState([]);
   const [appointments, setAppointments] = useState([]);
 
   const [form, setForm] = useState({
@@ -39,28 +20,30 @@ function App() {
 
   const [result, setResult] = useState(null);
   const [error, setError] = useState("");
-  
+
+  // Load doctors and appointments
   useEffect(() => {
-  loadAppointments();
-}, []);
+    loadDoctors();
+    loadAppointments();
+  }, []);
 
- const loadDoctors = async () => {
-  try {
-    const response = await fetch(
-      "http://localhost:5000/doctors"
-    );
+  const loadDoctors = async () => {
+    try {
+      const response = await fetch(
+        "http://localhost:5000/doctors"
+      );
 
-    if (!response.ok) {
-      throw new Error("Unable to load doctors");
+      if (!response.ok) {
+        throw new Error("Unable to load doctors");
+      }
+
+      const data = await response.json();
+      setDoctors(data);
+
+    } catch (err) {
+      setError(err.message);
     }
-
-    const data = await response.json();
-    setDoctors(data);
-
-  } catch (err) {
-    setError(err.message);
-  }
-};
+  };
 
   const loadAppointments = async () => {
     try {
@@ -138,7 +121,7 @@ function App() {
 
     try {
       const response = await fetch(
-        http://localhost:5000/appointments/${id}/cancel,
+        `http://localhost:5000/appointments/${id}/cancel`,
         {
           method: "PATCH"
         }
@@ -164,14 +147,7 @@ function App() {
       <h1>Online Doctor Appointment Management System</h1>
 
       <h2>Book Your Appointment</h2>
-<h2>Available Doctors</h2>
 
-{doctors.map((doctor) => (
-  <div key={doctor.id}>
-    <h3>{doctor.name}</h3>
-    <p>{doctor.specialization}</p>
-  </div>
-))}
       <form onSubmit={handleSubmit}>
 
         <label>Patient Name</label>
@@ -220,25 +196,26 @@ function App() {
           maxLength="10"
           required
         />
-<label>Select Doctor</label>
 
-<select
-  name="doctor_id"
-  value={form.doctor_id}
-  onChange={handleChange}
-  required
->
-  <option value="">Select Doctor</option>
+        <label>Select Doctor</label>
+        <select
+          name="doctor_id"
+          value={form.doctor_id}
+          onChange={handleChange}
+          required
+        >
+          <option value="">Select Doctor</option>
 
-  {doctors.map((doctor) => (
-    <option
-      key={doctor.id}
-      value={doctor.id}
-    >
-      {doctor.name} - {doctor.specialization}
-    </option>
-  ))}
-</select>
+          {doctors.map((doctor) => (
+            <option
+              key={doctor.doctor_id}
+              value={doctor.doctor_id}
+            >
+              {doctor.doctor_name} - {doctor.specialization}
+            </option>
+          ))}
+
+        </select>
 
         <label>Appointment Date</label>
         <input
