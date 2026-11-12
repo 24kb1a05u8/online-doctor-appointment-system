@@ -5,24 +5,34 @@ const cors = require("cors");
 
 const app = express();
 
-app.use(cors());
+app.use(cors({
+    origin: [
+        "https://24kb1a05u8.github.io",
+        "http://localhost:5173"
+    ]
+}));
+
 app.use(express.json());
 
-// MySQL connection
-const db = mysql.createConnection({
-    host: "localhost",
-    user: "root",
-    password: "",
-    database: "doctor_db"
+// Railway MySQL connection
+const db = mysql.createPool({
+    host: process.env.MYSQLHOST,
+    port: Number(process.env.MYSQLPORT || 3306),
+    user: process.env.MYSQLUSER,
+    password: process.env.MYSQLPASSWORD,
+    database: process.env.MYSQLDATABASE,
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 0
 });
 
-// Connect to MySQL
-db.connect((err) => {
+// Check database connection
+db.getConnection((err, connection) => {
     if (err) {
-        console.log("Database connection failed");
-        console.log(err);
+        console.log("Database connection failed:", err.message);
     } else {
-        console.log("MySQL connected successfully");
+        console.log("Railway MySQL connected successfully");
+        connection.release();
     }
 });
 
@@ -33,14 +43,13 @@ app.get("/", (req, res) => {
 
 // Get all doctors
 app.get("/doctors", (req, res) => {
-
     const sql = "SELECT * FROM doctors";
 
     db.query(sql, (err, result) => {
-
         if (err) {
+            console.log(err);
             return res.status(500).json({
-                message: "Database error"
+                message: "Unable to load doctors"
             });
         }
 
@@ -50,7 +59,6 @@ app.get("/doctors", (req, res) => {
 
 // Book appointment
 app.post("/appointments", (req, res) => {
-
     const {
         patient_name,
         age,
@@ -62,11 +70,15 @@ app.post("/appointments", (req, res) => {
         symptoms
     } = req.body;
 
-    // Validate input
     if (
-        !patient_name || !gender || !phone ||
-        !doctor_id || !appointment_date ||
-        !appointment_time || age === "" || age == null
+        !patient_name ||
+        !gender ||
+        !phone ||
+        !doctor_id ||
+        !appointment_date ||
+        !appointment_time ||
+        age === "" ||
+        age == null
     ) {
         return res.status(400).json({
             message: "Please enter all required details"
@@ -75,8 +87,11 @@ app.post("/appointments", (req, res) => {
 
     const patientAge = Number(age);
 
-    if (!Number.isInteger(patientAge) ||
-        patientAge < 1 || patientAge > 120) {
+    if (
+        !Number.isInteger(patientAge) ||
+        patientAge < 1 ||
+        patientAge > 120
+    ) {
         return res.status(400).json({
             message: "Enter a valid age"
         });
@@ -88,7 +103,6 @@ app.post("/appointments", (req, res) => {
         });
     }
 
-    // Check doctor availability
     const checkSql = `
         SELECT appointment_id
         FROM appointments
@@ -102,8 +116,8 @@ app.post("/appointments", (req, res) => {
         checkSql,
         [doctor_id, appointment_date, appointment_time],
         (err, result) => {
-
             if (err) {
+                console.log(err);
                 return res.status(500).json({
                     message: "Availability checking failed"
                 });
@@ -115,12 +129,19 @@ app.post("/appointments", (req, res) => {
                 });
             }
 
-            // Insert appointment
             const sql = `
                 INSERT INTO appointments
-                (patient_name, age, gender, phone,
-                 doctor_id, appointment_date,
-                 appointment_time, symptoms, status)
+                (
+                    patient_name,
+                    age,
+                    gender,
+                    phone,
+                    doctor_id,
+                    appointment_date,
+                    appointment_time,
+                    symptoms,
+                    status
+                )
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'Booked')
             `;
 
@@ -136,10 +157,8 @@ app.post("/appointments", (req, res) => {
             ];
 
             db.query(sql, values, (err, result) => {
-
                 if (err) {
                     console.log(err);
-
                     return res.status(500).json({
                         message: "Appointment booking failed"
                     });
@@ -161,7 +180,6 @@ app.post("/appointments", (req, res) => {
 
 // View all appointments
 app.get("/appointments", (req, res) => {
-
     const sql = `
         SELECT
             a.*,
@@ -174,8 +192,8 @@ app.get("/appointments", (req, res) => {
     `;
 
     db.query(sql, (err, result) => {
-
         if (err) {
+            console.log(err);
             return res.status(500).json({
                 message: "Unable to fetch appointments"
             });
@@ -187,7 +205,6 @@ app.get("/appointments", (req, res) => {
 
 // Cancel appointment
 app.patch("/appointments/:id/cancel", (req, res) => {
-
     const sql = `
         UPDATE appointments
         SET status = 'Cancelled'
@@ -196,8 +213,8 @@ app.patch("/appointments/:id/cancel", (req, res) => {
     `;
 
     db.query(sql, [req.params.id], (err, result) => {
-
         if (err) {
+            console.log(err);
             return res.status(500).json({
                 message: "Cancellation failed"
             });
@@ -215,7 +232,9 @@ app.patch("/appointments/:id/cancel", (req, res) => {
     });
 });
 
-// Start server
-app.listen(5000, () => {
-    console.log("Server running on port 5000");
+// Start server using Railway's port
+const PORT = process.env.PORT || 5000;
+
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
 });
