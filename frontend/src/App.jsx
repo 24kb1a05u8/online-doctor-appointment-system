@@ -1,10 +1,45 @@
 
 import { useEffect, useState } from "react";
 import "./App.css";
+import { useState } from "react";
+
+// FIRST CODE: Doctor list
+const doctors = [
+  {
+    id: 1,
+    name: "Dr. Ravi Kumar",
+    specialization: "Cardiologist"
+  },
+  {
+    id: 2,
+    name: "Dr. Priya",
+    specialization: "Dermatologist"
+  },
+  {
+    id: 3,
+    name: "Dr. Suresh",
+    specialization: "Neurologist"
+  },
+  {
+    id: 4,
+    name: "Dr. Lakshmi",
+    specialization: "General Physician"
+  }
+];
 
 function App() {
 
-  const [doctors, setDoctors] = useState([]);
+  return (
+    <div>
+      <h1>Online Doctor Appointment</h1>
+
+    </div>
+  );
+}
+
+export default App;
+function App() {
+
   const [appointments, setAppointments] = useState([]);
 
   const [form, setForm] = useState({
