@@ -25,7 +25,6 @@ const doctors = [
 ];
 function App() {
 
-  const [doctors, setDoctors] = useState([]);
   const [appointments, setAppointments] = useState([]);
 
   const [form, setForm] = useState({
@@ -41,30 +40,28 @@ function App() {
 
   const [result, setResult] = useState(null);
   const [error, setError] = useState("");
-
-  // Load doctors and appointments
+  
   useEffect(() => {
-    loadDoctors();
-    loadAppointments();
-  }, []);
+  loadAppointments();
+}, []);
 
-  const loadDoctors = async () => {
-    try {
-      const response = await fetch(
-        "http://localhost:5000/doctors"
-      );
+ const loadDoctors = async () => {
+  try {
+    const response = await fetch(
+      "http://localhost:5000/doctors"
+    );
 
-      if (!response.ok) {
-        throw new Error("Unable to load doctors");
-      }
-
-      const data = await response.json();
-      setDoctors(data);
-
-    } catch (err) {
-      setError(err.message);
+    if (!response.ok) {
+      throw new Error("Unable to load doctors");
     }
-  };
+
+    const data = await response.json();
+    setDoctors(data);
+
+  } catch (err) {
+    setError(err.message);
+  }
+};
 
   const loadAppointments = async () => {
     try {
