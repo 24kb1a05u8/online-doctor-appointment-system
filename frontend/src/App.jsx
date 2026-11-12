@@ -224,26 +224,25 @@ function App() {
           maxLength="10"
           required
         />
+<label>Select Doctor</label>
 
-        <label>Select Doctor</label>
-        <select
-          name="doctor_id"
-          value={form.doctor_id}
-          onChange={handleChange}
-          required
-        >
-          <option value="">Select Doctor</option>
+<select
+  name="doctor_id"
+  value={form.doctor_id}
+  onChange={handleChange}
+  required
+>
+  <option value="">Select Doctor</option>
 
-          {doctors.map((doctor) => (
-            <option
-              key={doctor.doctor_id}
-              value={doctor.doctor_id}
-            >
-              {doctor.doctor_name} - {doctor.specialization}
-            </option>
-          ))}
-
-        </select>
+  {doctors.map((doctor) => (
+    <option
+      key={doctor.id}
+      value={doctor.id}
+    >
+      {doctor.name} - {doctor.specialization}
+    </option>
+  ))}
+</select>
 
         <label>Appointment Date</label>
         <input
